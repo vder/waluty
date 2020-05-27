@@ -7,6 +7,7 @@ import doobie.util.ExecutionContexts
 import cats.effect.Blocker
 import doobie.h2.H2Transactor
 
+
 object Main extends IOApp {
 
   val transactor: Resource[IO, H2Transactor[IO]] =

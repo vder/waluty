@@ -23,6 +23,7 @@ lazy val root = (project in file("."))
       "ch.qos.logback" % "logback-classic" % LogbackVersion,
       "org.tpolecat" %% "doobie-core" % doobieVersion,
       "org.scala-lang.modules" %% "scala-xml" % "2.0.0-M1",
+      "com.h2database" % "h2" % "1.4.200",
       // And add any of these as needed
       "org.tpolecat" %% "doobie-h2" % doobieVersion, // H2 driver 1.4.200 + type mappings.
       "org.tpolecat" %% "doobie-hikari" % doobieVersion // HikariCP transactor.

@@ -1,8 +1,8 @@
-create table users(regno text unique, name String);
+create table if not exists users(regno varchar unique, name text);
 
-create table balance(regno text, currency text, amount BigDecimal);
+create table if not exists balance(regno varchar, currency text, amount Number);
 
 
-insert into users values ('1','user testowy');
-insert into balance(1,'PLN',30);
-insert into balance(1,'USD',100);
+insert into users select   '1','user testowy' where not exists (select null from users where regno = '1');
+insert into balance select '1','PLN',30 where not exists (select null from balance where regno = '1' and currency = 'PLN');
+insert into balance select '1','USD',100 where not exists (select null from balance where regno = '1' and currency = 'USD');
