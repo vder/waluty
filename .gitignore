@@ -479,3 +479,8 @@ project/target/config-classes/$9e4142a44cbfe3190f0c$.class
 target/scala-2.13/classes/pf/task/waluty/worksheets/ExchangeRate.class
 target/scala-2.13/classes/pf/task/waluty/worksheets/ExchangeRate$.class
 target/scala-2.13/classes/pf/task/waluty/worksheets/ExchangeRate$$anon$1.class
+.history/
+.metals/
+project/
+target/scala-2.13/classes/pf/task/waluty/model/Currency$.class
+target/
