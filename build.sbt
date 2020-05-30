@@ -26,7 +26,8 @@ lazy val root = (project in file("."))
       "com.h2database" % "h2" % "1.4.200",
       // And add any of these as needed
       "org.tpolecat" %% "doobie-h2" % doobieVersion, // H2 driver 1.4.200 + type mappings.
-      "org.tpolecat" %% "doobie-hikari" % doobieVersion // HikariCP transactor.
+      "org.tpolecat" %% "doobie-hikari" % doobieVersion, // HikariCP transactor.
+      "com.lucidchart" %% "xtract" % "2.2.1",
       //"org.tpolecat" %% "doobie-postgres"  % doobieVersion,          // Postgres driver 42.2.9 + type mappings.
       //"org.tpolecat" %% "doobie-quill"     % doobieVersion,          // Support for Quill 3.4.10
       // "org.tpolecat" %% "doobie-specs2"    % doobieVersion % "test", // Specs2 support for typechecking statements.
