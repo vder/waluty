@@ -22,6 +22,8 @@ import cats.ApplicativeError
 import cats.FlatMap
 import cats.Functor
 import cats.effect.Sync
+import com.lucidchart.open.xtract.XmlReader
+import scala.math.BigDecimal.RoundingMode
 
 trait ExchangeService[F[_]] {
   def calculate(
@@ -35,8 +37,6 @@ class LiveExchangeService[F[_]: ApplicativeThrowable: FlatMap: Functor: Sync](
     client: Client[F]
 ) extends ExchangeService[F] {
 
-  val mc = new java.math.MathContext(2)
-
   override def calculate(
       fromCurrencyCode: String,
       toCurrencyCode: String,
@@ -48,9 +48,10 @@ class LiveExchangeService[F[_]: ApplicativeThrowable: FlatMap: Functor: Sync](
           s"http://api.nbp.pl/api/exchangerates/rates/a/${toCurrencyCode.toLowerCase()}"
         )
         .liftTo[F]
-      respJson <- client.expect[Json](uri)
-      exRate <- respJson.as[ExchangeRate].liftTo[F]
-    } yield (amount / exRate.rate).round(mc)
+      respXml <- client.expect[Elem](uri)
+      exRate <- XmlReader.of[ExchangeRate].read(respXml).fold(f => new Exception(f.mkString).asLeft[ExchangeRate])(_.asRight).liftTo[F]
+       _ <- Sync[F].delay {println(s"amount =$amount"); println(s" rate = ${exRate.rate}")}
+    } yield (amount / exRate.rate).setScale(2,RoundingMode.FLOOR)
 
 }
 

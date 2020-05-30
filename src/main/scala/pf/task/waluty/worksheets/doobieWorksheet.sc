@@ -33,9 +33,6 @@ repo.getAccount("1").unsafeRunSync()
 
 
 
-
-
-
 val usrAccount = UserAccount("Ja","moj pesel",List(USD(30),PLN(1000)))
 
 repo.createAccount(usrAccount)
