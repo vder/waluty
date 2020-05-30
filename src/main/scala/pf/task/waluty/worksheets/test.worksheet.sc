@@ -17,11 +17,11 @@ implicit val cs: ContextShift[IO] = IO.contextShift(global)
 implicit val timer: Timer[IO] = IO.timer(global)
 
 
- /*val tx = Transactor.fromDriverManager[IO](
+ val tx = Transactor.fromDriverManager[IO](
     "org.h2.Driver", // driver classname
     """jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;INIT=runscript from './src/main/resources/create.sql';"""
    )
-*/
+
  
  println("test")
 

@@ -1,8 +1,10 @@
+package pf.task.waluty.services
+
 import scala.xml.Elem
 import pf.task.waluty.worksheets.ExchangeRate
 import io.circe.Json
 import io.circe.syntax._
-import org.http4s.scalaxml
+import org.http4s.scalaxml._
 import pf.task.waluty.TypeAliases._
 
 import cats.effect.Timer
@@ -19,6 +21,7 @@ import scala.language.implicitConversions
 import cats.ApplicativeError
 import cats.FlatMap
 import cats.Functor
+import cats.effect.Sync
 
 trait ExchangeService[F[_]] {
   def calculate(
@@ -28,21 +31,31 @@ trait ExchangeService[F[_]] {
   ): F[BigDecimal]
 }
 
-class LiveExchangeService[F[_]: ApplicativeThrowable: FlatMap: Functor](client: Client[F])
-    extends ExchangeService[F] {
+class LiveExchangeService[F[_]: ApplicativeThrowable: FlatMap: Functor: Sync](
+    client: Client[F]
+) extends ExchangeService[F] {
 
-val mc = new java.math.MathContext(2)
+  val mc = new java.math.MathContext(2)
 
-  override def calculate(fromCurrencyCode: String,
+  override def calculate(
+      fromCurrencyCode: String,
       toCurrencyCode: String,
       amount: BigDecimal
-  ): F[BigDecimal] = 
+  ): F[BigDecimal] =
     for {
-      uri <- Uri.fromString( s"http://api.nbp.pl/api/exchangerates/rates/a/${toCurrencyCode.toLowerCase()}").liftTo[F]
+      uri <- Uri
+        .fromString(
+          s"http://api.nbp.pl/api/exchangerates/rates/a/${toCurrencyCode.toLowerCase()}"
+        )
+        .liftTo[F]
       respJson <- client.expect[Json](uri)
-      exRate = respJson.as[ExchangeRate].rate
-    } yield (amount/exRate).round(mc)
+      exRate <- respJson.as[ExchangeRate].liftTo[F]
+    } yield (amount / exRate.rate).round(mc)
 
-  
+}
 
+object LiveExchangeService {
+  def make[F[_]: ApplicativeThrowable: FlatMap: Functor: Sync](
+      client: Client[F]
+  ) = new LiveExchangeService[F](client)
 }

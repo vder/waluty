@@ -51,10 +51,15 @@ class LiveAccountRepository[F[_]: Monad: ThrowableBracket](xa: Transactor[F])
     val insert = for {
       insAcc <- sql"insert into users(regno,name) values (${acc.regno},${acc.name})".update.run
       insBal <- Update[(String, BigDecimal)](
-        s"insert into balance(regno,currency,amount) values(${acc.regno},?,?)"
+        s"insert into balance(regno,currency,amount) values('${acc.regno}',?,?)"
       ).updateMany(acc.balance.map(Currency.currency2Tuple(_)))
     } yield insAcc + insBal
     insert.transact(xa)
   }
 
+}
+
+
+object LiveAccountRepository{
+  def make[F[_]: Monad: ThrowableBracket](xa: Transactor[F]) = new LiveAccountRepository(xa)
 }

@@ -1,5 +1,7 @@
+
 import scala.xml.Elem
 import pf.task.waluty.worksheets.ExchangeRate
+import pf.task.waluty.services.LiveExchangeService
 import io.circe.Json
 import io.circe.syntax._
 
@@ -47,6 +49,12 @@ respJson.spaces2
 respJson.as[ExchangeRate]
 
 
+
+val exService = LiveExchangeService.make(httpClient)
+
+
+exService.calculate("PLN","USD",10).unsafeRunSync()
+exService.calculate("PLN","USD",20).unsafeRunSync()
 
 
 val c = respJson.hcursor
