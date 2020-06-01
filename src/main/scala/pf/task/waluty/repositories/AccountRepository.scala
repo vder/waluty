@@ -11,14 +11,31 @@ import cats.effect.Bracket
 import pf.task.waluty.model.Currency
 import doobie.util.update.Update
 
+
 trait AccountRepository[F[_]] {
   def getAccount(regno: String): F[Option[UserAccount]]
   def updateAccount(acc: UserAccount): F[Int]
   def createAccount(acc: UserAccount): F[Int]
+  def findAll: F[List[UserAccount]]
 }
 
 class LiveAccountRepository[F[_]: Monad: ThrowableBracket](xa: Transactor[F])
     extends AccountRepository[F] {
+
+  override def findAll: F[List[UserAccount]] = {
+    val all: ConnectionIO[List[UserAccount]] = for {
+      allAcounts <- sql"""select u.regno, u.name, b.currency, b.amount 
+                           |from users as u 
+                           |join balance as b
+                           |  on u.regno = b.regno""".stripMargin
+        .query[(String, String,String,BigDecimal)]
+        .to[List]
+    } yield allAcounts.groupMap{case (regno,name,_,_) => (regno,name)}{case (_,_,currency,amount) => Currency(currency,amount)}
+            .toList
+            .map{case ((regno,name),currencyList) => UserAccount(name,regno,currencyList)} 
+    all.transact(xa)
+  }
+
 
   override def getAccount(regno: String): F[Option[UserAccount]] = {
     val acc: ConnectionIO[Option[UserAccount]] = for {
