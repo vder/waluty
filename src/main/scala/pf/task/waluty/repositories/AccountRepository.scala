@@ -10,17 +10,29 @@ import cats.Monad
 import cats.effect.Bracket
 import pf.task.waluty.model.Currency
 import doobie.util.update.Update
+import cats.FlatMap
+import cats.effect.Sync
 
 
 trait AccountRepository[F[_]] {
   def getAccount(regno: String): F[Option[UserAccount]]
   def updateAccount(acc: UserAccount): F[Int]
   def createAccount(acc: UserAccount): F[Int]
+  def deleteAccount(regno: String): F[Int]
   def findAll: F[List[UserAccount]]
 }
 
-class LiveAccountRepository[F[_]: Monad: ThrowableBracket](xa: Transactor[F])
+class LiveAccountRepository[F[_]: Monad: ThrowableBracket: FlatMap](xa: Transactor[F])
     extends AccountRepository[F] {
+
+  override def deleteAccount(regno: String): F[Int] = {
+        val delete = for {
+      delAcc <- sql"delete from users  where regno = ${regno})".update.run
+      delBal <- sql"delete from balance where regno = ${regno}".update.run
+     } yield delAcc + delBal
+    delete.transact(xa)
+  }
+
 
   override def findAll: F[List[UserAccount]] = {
     val all: ConnectionIO[List[UserAccount]] = for {
@@ -78,5 +90,5 @@ class LiveAccountRepository[F[_]: Monad: ThrowableBracket](xa: Transactor[F])
 
 
 object LiveAccountRepository{
-  def make[F[_]: Monad: ThrowableBracket](xa: Transactor[F]) = new LiveAccountRepository(xa)
+  def make[F[_]: Monad: ThrowableBracket: Sync ](xa: Transactor[F]) = Sync[F].delay {new LiveAccountRepository(xa)}
 }
