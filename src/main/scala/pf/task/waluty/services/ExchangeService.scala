@@ -1,29 +1,29 @@
 package pf.task.waluty.services
 
-import scala.xml.Elem
-import pf.task.waluty.worksheets.ExchangeRate
-import io.circe.Json
-import io.circe.syntax._
-import org.http4s.scalaxml._
-import pf.task.waluty.TypeAliases._
 
-import cats.effect.Timer
-import cats.effect.ContextShift
-import cats.effect.IO
-import org.http4s.client.blaze._
-import org.http4s.client._
-import org.http4s.circe._
-import org.http4s.Uri
-import cats.implicits._
-import scala.concurrent.ExecutionContext.Implicits.global
-import pf.task.waluty.model.Currency
-import scala.language.implicitConversions
 import cats.ApplicativeError
 import cats.FlatMap
 import cats.Functor
+import cats.effect.ContextShift
+import cats.effect.IO
 import cats.effect.Sync
+import cats.effect.Timer
+import cats.implicits._
 import com.lucidchart.open.xtract.XmlReader
+import io.circe.Json
+import io.circe.syntax._
+import org.http4s.Uri
+import org.http4s.circe._
+import org.http4s.client._
+import org.http4s.client.blaze._
+import org.http4s.scalaxml._
+import pf.task.waluty.TypeAliases._
+import pf.task.waluty.model.Currency
+import pf.task.waluty.worksheets.ExchangeRate
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.implicitConversions
 import scala.math.BigDecimal.RoundingMode
+import scala.xml.Elem
 
 trait ExchangeService[F[_]] {
   def calculate(
